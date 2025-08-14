@@ -134,7 +134,7 @@ nixpkgs.config.allowUnfree = true;
   vscode
   jdk17
   neofetch
-  jetbrains.idea-ultimate
+  #jetbrains.idea-ultimate
   zsh
  (import (fetchTarball "https://github.com/NixOS/nixpkgs/archive/nixpkgs-unstable.tar.gz") {}).dart
   brave
@@ -154,9 +154,47 @@ nixpkgs.config.allowUnfree = true;
   fira-code  
   gnome-tweaks
   tmux
-jetbrains-toolbox
-   vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+  jetbrains-toolbox
+  termius
+  filezilla
+  postman
+  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
   #  wget
+  ];
+
+    # Bật nix-ld để chạy app ngoài NixOS (DataGrip, Android Studio…)
+  programs.nix-ld.enable = true;
+  programs.nix-ld.libraries = with pkgs; [
+  glibc
+    gtk3
+    gtk2
+    glib
+    cairo
+    pango
+    atk
+    gdk-pixbuf
+    fontconfig
+    freetype
+    cups
+    alsa-lib
+    libdrm
+    libuuid
+
+    xorg.libX11
+    xorg.libXext
+    xorg.libXi
+    xorg.libXrender
+    xorg.libXrandr
+    xorg.libXtst
+    xorg.libxcb
+    xorg.libXcomposite
+    xorg.libXdamage
+    xorg.libXfixes
+    xorg.libXcursor
+    xorg.libXinerama
+    xorg.libXxf86vm
+    xorg.libXScrnSaver
+    xorg.libXft
   ];
     # Gỡ GNOME Console
   environment.gnome.excludePackages = with pkgs; [
