@@ -38,3 +38,6 @@ rm -rf ~/.oh-my-zsh
 ln -s ~/nixos-config/.zshrc ~/.zshrc
 ln -s ~/nixos-config/.oh-my-zsh ~/.oh-my-zsh
 
+
+
+ln -s  ~/nixos-config/.gitconfig ~/.gitconfig 

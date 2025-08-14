@@ -1,0 +1,19 @@
+[alias]
+    st  = status
+    s   = status -s
+    c   = commit
+    cm  = commit -m
+    ca  = commit --amend
+    lg  = log --oneline --graph --decorate --all
+    br  = branch
+    co  = checkout
+    sw  = switch
+    nb  = "!git checkout -b"
+    pl  = pull
+    ph  = push
+    df  = diff
+    dfc = diff --cached
+    rs  = reset
+    rsh = reset --hard
+[user]
+	email = quangbeo216@gmail.com
