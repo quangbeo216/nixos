@@ -28,3 +28,6 @@ PROMPT='%F{green}%n@%m %F{blue}%~ %# %f'
 # Nếu bạn dùng oh-my-zsh, uncomment dòng dưới
  source $HOME/.oh-my-zsh/oh-my-zsh.sh
  ZSH_THEME="agnoster"
+ 
+ export DART_SDK_HOME=$(dirname $(dirname $(which dart)))/lib/dart
+export PATH=$DART_SDK_HOME/bin:$PATH
