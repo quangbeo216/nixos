@@ -203,7 +203,10 @@ fonts = {
     xorg.libXft
   ];
   programs.zsh.enable = true;
-  
+    # Gỡ GNOME Console
+  environment.gnome.excludePackages = with pkgs; [
+    gnome-console
+  ];
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
   # programs.mtr.enable = true;
