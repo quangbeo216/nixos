@@ -22,12 +22,37 @@ alias ...='cd ../..'
 # Enable colored output
 autoload -U colors && colors
 
-# Prompt đơn giản, hiển thị user@host và thư mục hiện tại
-PROMPT='%F{green}%n@%m %F{blue}%~ %# %f'
-
 # Nếu bạn dùng oh-my-zsh, uncomment dòng dưới
  source $HOME/.oh-my-zsh/oh-my-zsh.sh
  ZSH_THEME="agnoster"
  
  export DART_SDK_HOME=$(dirname $(dirname $(which dart)))/lib/dart
 export PATH=$DART_SDK_HOME/bin:$PATH
+
+# Enable colors
+autoload -U colors && colors
+
+# Prompt config
+setopt prompt_subst
+
+PROMPT='%F{cyan}%n%f@%F{green}%m%f %F{yellow}%~%f $(git_prompt_info)%# '
+
+# Git branch hiển thị trong prompt
+autoload -Uz vcs_info
+precmd() { vcs_info }
+zstyle ':vcs_info:git:*' formats '(%b)'
+zstyle ':vcs_info:*' enable git
+RPROMPT='%F{magenta}${vcs_info_msg_0_}%f'
+
+# Aliases hay dùng
+alias ll='ls -lah --color=auto'
+alias gs='git status'
+alias gl='git log --oneline --graph --decorate'
+alias ..='cd ..'
+alias ...='cd ../..'
+
+# History
+HISTSIZE=5000
+SAVEHIST=5000
+HISTFILE=~/.zsh_history
+

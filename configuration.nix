@@ -9,12 +9,14 @@
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
     ];
-  
-	
+
   # Bootloader.
   boot.loader.grub.enable = true;
-  boot.loader.grub.device = "/dev/sda";
+  boot.loader.grub.device = "/dev/nvme0n1";
   boot.loader.grub.useOSProber = true;
+  
+boot.loader.systemd-boot.enable = false;
+boot.loader.efi.canTouchEfiVariables = false;
 
   networking.hostName = "nixos"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
@@ -165,6 +167,8 @@ fonts = {
     vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
     docker
     docker-compose
+    maven
+    unzip
     #  wget
   ];
 
