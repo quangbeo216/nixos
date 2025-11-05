@@ -12,7 +12,7 @@
 
   # Bootloader.
   boot.loader.grub.enable = true;
-  boot.loader.grub.device = "/dev/nvme0n1";
+  boot.loader.grub.device = "/dev/sda";
   boot.loader.grub.useOSProber = true;
   
 boot.loader.systemd-boot.enable = false;
@@ -169,6 +169,8 @@ fonts = {
     docker-compose
     maven
     unzip
+    mkcert
+    chromium
     #  wget
   ];
 
@@ -225,7 +227,11 @@ fonts = {
   # services.openssh.enable = true;
 
   # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
+  networking.firewall.allowedTCPPorts = [
+  443 # Port HTTPS của Nginx
+  # 80 # Nếu bạn muốn dùng HTTP, cũng cần thêm vào (hiện tại không thấy map)
+  3306 # Port MySQL
+];
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
@@ -237,5 +243,7 @@ fonts = {
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "25.05"; # Did you read the comment?
-
+ networking.extraHosts = ''
+  127.0.0.1 company.rakulia.local reg.rakulia.local cert.rakulia.local aid.rakulia.local console.rakulia.local
+'';
 }
