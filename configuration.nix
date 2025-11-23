@@ -89,7 +89,6 @@ boot.loader.efi.canTouchEfiVariables = false;
   # Enable sound with pipewire.
   services.pulseaudio.enable = false;
   security.rtkit.enable = true;
-  virtualisation.docker.enable = true;
   services.pipewire = {
     enable = true;
     alsa.enable = true;
@@ -171,6 +170,10 @@ fonts = {
     unzip
     mkcert
     chromium
+    microsoft-edge
+        protonvpn-gui
+    protonvpn-cli
+    flameshot
     #  wget
   ];
 
@@ -231,6 +234,7 @@ fonts = {
   443 # Port HTTPS của Nginx
   # 80 # Nếu bạn muốn dùng HTTP, cũng cần thêm vào (hiện tại không thấy map)
   3306 # Port MySQL
+  5432
 ];
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
@@ -246,4 +250,42 @@ fonts = {
  networking.extraHosts = ''
   127.0.0.1 company.rakulia.local reg.rakulia.local cert.rakulia.local aid.rakulia.local console.rakulia.local
 '';
+
+boot.kernelParams = [ "systemd.unified_cgroup_hierarchy=1" ];
+virtualisation.docker = {
+  enable = true;
+  extraOptions = "--experimental --exec-opt native.cgroupdriver=systemd";
+};
+
+systemd.services.docker.serviceConfig = {
+  PrivateTmp = false;
+  ProtectHome = false;
+  MountFlags = "shared";
+};
+
+
+services.postgresql = {
+  enable = true;
+  package = pkgs.postgresql_15;
+  dataDir = "/var/lib/postgresql/data";
+
+  initialScript = null;
+
+  settings = {
+    listen_addresses = pkgs.lib.mkForce "*";  # ép giá trị này, ghi đè localhost
+    port = 5432;
+    max_connections = 100;
+    shared_buffers = "128MB";
+  };
+    # Thêm authentication để map vào pg_hba.conf
+  authentication = ''
+    # Local postgres user
+    local   all             postgres                                peer
+
+    # Cho phép tất cả Docker container mạng 172.21.0.0/16 connect
+    host    all             all             172.21.0.0/16         md5
+  '';
+};
+
+
 }
