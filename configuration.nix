@@ -8,15 +8,10 @@
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
+      ./pc.nix
     ];
-
-  # Bootloader.
-  boot.loader.grub.enable = true;
-  boot.loader.grub.device = "/dev/sda";
-  boot.loader.grub.useOSProber = true;
-  
-boot.loader.systemd-boot.enable = false;
-boot.loader.efi.canTouchEfiVariables = false;
+  boot.loader.systemd-boot.enable = false;
+  boot.loader.efi.canTouchEfiVariables = false;
 
   networking.hostName = "nixos"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
@@ -132,50 +127,7 @@ fonts = {
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
-  # List packages installed in system profile. To search, run:
-  # $ nix search wget
-  environment.systemPackages = with pkgs; [
-    vscode
-    jdk17
-    neofetch
-    #jetbrains.idea-ultimate
-    zsh
-    dart
-    brave
-    git
-    flutter
-    android-studio
-    google-chrome
-    lm_sensors
-    htop
-    piper
-    python3
-    python3Packages.pip  # cài luôn pip
-    nodejs_22
-    kitty
-    fira-code  
-    nautilus
-    fira-code  
-    gnome-tweaks
-    tmux
-    jetbrains-toolbox
-    termius
-    filezilla
-    postman
-    anydesk
-    vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-    docker
-    docker-compose
-    maven
-    unzip
-    mkcert
-    chromium
-    microsoft-edge
-        protonvpn-gui
-    protonvpn-cli
-    flameshot
-    #  wget
-  ];
+  
 
  # Bật nix-ld để chạy app ngoài NixOS (DataGrip, Android Studio…)
   programs.nix-ld.enable = true;
@@ -231,11 +183,11 @@ fonts = {
 
   # Open ports in the firewall.
   networking.firewall.allowedTCPPorts = [
-  443 # Port HTTPS của Nginx
-  # 80 # Nếu bạn muốn dùng HTTP, cũng cần thêm vào (hiện tại không thấy map)
-  3306 # Port MySQL
-  5432
-];
+    443 # Port HTTPS của Nginx
+    # 80 # Nếu bạn muốn dùng HTTP, cũng cần thêm vào (hiện tại không thấy map)
+    3306 # Port MySQL
+    5432
+  ];
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
@@ -248,44 +200,44 @@ fonts = {
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "25.05"; # Did you read the comment?
  networking.extraHosts = ''
-  127.0.0.1 company.rakulia.local reg.rakulia.local cert.rakulia.local aid.rakulia.local console.rakulia.local
-'';
-
-boot.kernelParams = [ "systemd.unified_cgroup_hierarchy=1" ];
-virtualisation.docker = {
-  enable = true;
-  extraOptions = "--experimental --exec-opt native.cgroupdriver=systemd";
-};
-
-systemd.services.docker.serviceConfig = {
-  PrivateTmp = false;
-  ProtectHome = false;
-  MountFlags = "shared";
-};
-
-
-services.postgresql = {
-  enable = true;
-  package = pkgs.postgresql_15;
-  dataDir = "/var/lib/postgresql/data";
-
-  initialScript = null;
-
-  settings = {
-    listen_addresses = pkgs.lib.mkForce "*";  # ép giá trị này, ghi đè localhost
-    port = 5432;
-    max_connections = 100;
-    shared_buffers = "128MB";
-  };
-    # Thêm authentication để map vào pg_hba.conf
-  authentication = ''
-    # Local postgres user
-    local   all             postgres                                peer
-
-    # Cho phép tất cả Docker container mạng 172.21.0.0/16 connect
-    host    all             all             172.21.0.0/16         md5
+    127.0.0.1 company.rakulia.local reg.rakulia.local cert.rakulia.local aid.rakulia.local console.rakulia.local
   '';
-};
+
+  boot.kernelParams = [ "systemd.unified_cgroup_hierarchy=1" ];
+  virtualisation.docker = {
+    enable = true;
+    extraOptions = "--experimental --exec-opt native.cgroupdriver=systemd";
+  };
+
+  systemd.services.docker.serviceConfig = {
+    PrivateTmp = false;
+    ProtectHome = false;
+    MountFlags = "shared";
+  };
+
+
+  services.postgresql = {
+    enable = true;
+    package = pkgs.postgresql_15;
+    dataDir = "/var/lib/postgresql/data";
+
+    initialScript = null;
+
+    settings = {
+      listen_addresses = pkgs.lib.mkForce "*";  # ép giá trị này, ghi đè localhost
+      port = 5432;
+      max_connections = 100;
+      shared_buffers = "128MB";
+    };
+      # Thêm authentication để map vào pg_hba.conf
+    authentication = ''
+      # Local postgres user
+      local   all             postgres                                peer
+
+      # Cho phép tất cả Docker container mạng 172.21.0.0/16 connect
+      host    all             all             172.21.0.0/16         md5
+    '';
+  };
 
 
 }
