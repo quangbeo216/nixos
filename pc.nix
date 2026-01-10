@@ -5,7 +5,8 @@
 {
   # Bootloader.
   boot.loader.grub.enable = true;
-  boot.loader.grub.device = "/dev/sda";
+  #boot.loader.grub.device = "/dev/sda";
+  boot.loader.grub.device = "/dev/nvme0n1";
   boot.loader.grub.useOSProber = true;
 
   # List packages installed in system profile. To search, run:
@@ -50,6 +51,10 @@
     protonvpn-gui
     protonvpn-cli
     flameshot
+    gnome-extensions-cli
+    gnomeExtensions.blur-my-shell
     #  wget
   ];
+
+  
 }

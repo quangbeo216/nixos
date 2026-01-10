@@ -27,7 +27,7 @@ autoload -U colors && colors
  ZSH_THEME="agnoster"
  
  export DART_SDK_HOME=$(dirname $(dirname $(which dart)))/lib/dart
-export PATH=$DART_SDK_HOME/bin:$PATH
+ export PATH=$DART_SDK_HOME/bin:$PATH
 
 # Enable colors
 autoload -U colors && colors
@@ -55,4 +55,3 @@ alias ...='cd ../..'
 HISTSIZE=5000
 SAVEHIST=5000
 HISTFILE=~/.zsh_history
-

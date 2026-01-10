@@ -101,6 +101,9 @@
   # services.xserver.libinput.enable = true;
 fonts = {
     enableDefaultFonts = true;
+    packages = with pkgs; [
+      courier-prime    # chứa Nimbus Mono PS
+    ];
     fontconfig = {
       enable = true;
       antialias = true;
@@ -215,6 +218,7 @@ fonts = {
     MountFlags = "shared";
   };
 
+/*
 
   services.postgresql = {
     enable = true;
@@ -238,6 +242,7 @@ fonts = {
       host    all             all             172.21.0.0/16         md5
     '';
   };
+*/
 
 
 }

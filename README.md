@@ -41,3 +41,5 @@ ln -s ~/nixos-config/.oh-my-zsh ~/.oh-my-zsh
 
 
 ln -s  ~/nixos-config/.gitconfig ~/.gitconfig 
+
+ln -s  ~/nixos-config/.tmux.conf ~/.tmux.conf
