@@ -15,7 +15,6 @@
     vscode
     jdk17
     neofetch
-    #jetbrains.idea-ultimate
     zsh
     dart
     brave
@@ -46,13 +45,13 @@
     maven
     unzip
     mkcert
-    chromium
     microsoft-edge
     protonvpn-gui
     protonvpn-cli
     flameshot
     gnome-extensions-cli
     gnomeExtensions.blur-my-shell
+    cmake
     #  wget
   ];
 

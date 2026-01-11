@@ -9,6 +9,7 @@
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
       ./pc.nix
+      ./shortcuts.nix
     ];
   boot.loader.systemd-boot.enable = false;
   boot.loader.efi.canTouchEfiVariables = false;
@@ -122,6 +123,7 @@ fonts = {
     packages = with pkgs; [
     #  thunderbird
     ];
+    shell = pkgs.zsh;
   };
   services.ratbagd.enable = true;
   # Install firefox.
