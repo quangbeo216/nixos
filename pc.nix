@@ -52,6 +52,16 @@
     gnome-extensions-cli
     gnomeExtensions.blur-my-shell
     cmake
+    clang
+    glibc
+    zlib
+    ncurses5
+    patchelf
+    ninja
+    pkg-config
+    gtk3
+    yarn
+    rustdesk
     #  wget
   ];
 

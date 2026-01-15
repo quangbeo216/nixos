@@ -104,6 +104,12 @@ fonts = {
     enableDefaultFonts = true;
     packages = with pkgs; [
       courier-prime    # chứa Nimbus Mono PS
+      noto-fonts
+      noto-fonts-cjk-sans
+      noto-fonts-cjk-serif
+      noto-fonts-emoji
+      ipaexfont
+      ipafont
     ];
     fontconfig = {
       enable = true;
@@ -167,6 +173,12 @@ fonts = {
     xorg.libXxf86vm
     xorg.libXScrnSaver
     xorg.libXft
+    zlib
+    ncurses5
+    stdenv.cc.cc
+    stdenv.cc.cc.lib
+    gcc
+    binutils
   ];
   programs.zsh.enable = true;
     # Gỡ GNOME Console
