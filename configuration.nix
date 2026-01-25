@@ -16,7 +16,12 @@
 
   networking.hostName = "nixos"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
-  environment.variables.TERMINAL = "kitty";
+
+  environment.variables = {
+    GDK_SCALE = "1";
+    GDK_DPI_SCALE = "1";
+    TERMINAL = "kitty";
+  };
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
   # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
@@ -43,16 +48,26 @@
     LC_TELEPHONE = "vi_VN";
     LC_TIME = "vi_VN";
   };
+  # Tắt IBus
+i18n.inputMethod = {
+  enable = true;
+  type = "fcitx5";
 
-  i18n.inputMethod = {
-    enabled = "fcitx5";
-    fcitx5.addons = with pkgs; [
-      fcitx5-unikey        # Bộ gõ tiếng Việt
-      fcitx5-gtk           # Hỗ trợ cho ứng dụng GTK
-#      fcitx5-qt            # Hỗ trợ cho ứng dụng Qt
-    ];
-  };
+  fcitx5.addons = with pkgs; [
+    
+        fcitx5-gtk
+    qt6Packages.fcitx5-qt
+    qt6Packages.fcitx5-unikey
+    qt6Packages.fcitx5-configtool
+  ];
+};
 
+
+environment.sessionVariables = {
+  XMODIFIERS = "@im=fcitx";   # cho XWayland app
+  QT_IM_MODULE = "fcitx";     # Qt < 6.8.2 và để tương thích GNOME Mutter
+  GTK_IM_MODULE = "fcitx";    # cho Chrome chạy XWayland
+};
   # Enable the GNOME Desktop Environment.
   # Configure keymap in X11
   # Enable the X11 windowing system.
@@ -107,7 +122,7 @@ fonts = {
       noto-fonts
       noto-fonts-cjk-sans
       noto-fonts-cjk-serif
-      noto-fonts-emoji
+      noto-fonts-color-emoji
       ipaexfont
       ipafont
     ];
@@ -115,7 +130,7 @@ fonts = {
       enable = true;
       antialias = true;
       hinting.enable = true;
-      hinting.style = "full";
+      hinting.style = "slight";
       subpixel = {
         rgba = "rgb";
       };

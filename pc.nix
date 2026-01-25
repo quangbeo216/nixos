@@ -47,7 +47,6 @@
     mkcert
     microsoft-edge
     protonvpn-gui
-    protonvpn-cli
     flameshot
     gnome-extensions-cli
     gnomeExtensions.blur-my-shell
@@ -62,6 +61,7 @@
     gtk3
     yarn
     rustdesk
+    fcitx5
     #  wget
   ];
 
