@@ -9,6 +9,7 @@
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
       ./homelap.nix
+      ./k3s.nix
     ];
   boot.loader.systemd-boot.enable = false;
   boot.loader.efi.canTouchEfiVariables = false;
@@ -52,14 +53,15 @@ i18n.inputMethod = {
   enable = true;
   type = "fcitx5";
 
-  fcitx5.addons = with pkgs; [
-    
-        fcitx5-gtk
-    qt6Packages.fcitx5-qt
-    qt6Packages.fcitx5-unikey
-    qt6Packages.fcitx5-configtool
-  ];
-};
+  i18n.inputMethod = {
+    enable = true;
+    type = "fcitx5";
+    fcitx5.addons = with pkgs; [
+      qt6Packages.fcitx5-unikey  # Bộ gõ tiếng Việt
+      fcitx5-gtk           # Hỗ trợ cho ứng dụng GTK
+#      fcitx5-qt            # Hỗ trợ cho ứng dụng Qt
+    ];
+  };
 
 
 environment.sessionVariables = {
@@ -78,20 +80,35 @@ environment.sessionVariables = {
     xkb = {
       layout = "us";
       variant = "";
-     options = "caps:ctrl_modifier";
+      options = "caps:ctrl_modifier";
     };
   };
-  
+
   hardware.opengl = {
     enable = true;
   };
- # Blacklist NVIDIA proprietary modules
-    boot.blacklistedKernelModules = [
-      "nvidia"
-      "nvidia_drm"
-      "nvidia_modeset"
-      "nvidia_uvm"
-    ];
+
+  programs.neovim = {
+    enable = true;
+    defaultEditor = true;
+    viAlias = true;
+    vimAlias = true;
+  };
+
+  environment.systemPackages = with pkgs; [
+    neovim
+    wl-clipboard
+    ripgrep
+    fzf
+  ];
+
+  # Blacklist NVIDIA proprietary modules
+  boot.blacklistedKernelModules = [
+    "nvidia"
+    "nvidia_drm"
+    "nvidia_modeset"
+    "nvidia_uvm"
+  ];
 
   # Enable CUPS to print documents.
   services.printing.enable = true;
@@ -114,8 +131,8 @@ environment.sessionVariables = {
 
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
-fonts = {
-    enableDefaultFonts = true;
+  fonts = {
+    enableDefaultPackages = true;
     packages = with pkgs; [
       courier-prime    # chứa Nimbus Mono PS
       noto-fonts
@@ -154,10 +171,10 @@ fonts = {
 
   
 
- # Bật nix-ld để chạy app ngoài NixOS (DataGrip, Android Studio…)
+  # Bật nix-ld để chạy app ngoài NixOS (DataGrip, Android Studio…)
   programs.nix-ld.enable = true;
   programs.nix-ld.libraries = with pkgs; [
-  glibc
+    glibc
     gtk3
     gtk2
     glib
@@ -230,8 +247,8 @@ fonts = {
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "25.05"; # Did you read the comment?
- networking.extraHosts = ''
-    127.0.0.1 company.rakulia.local reg.rakulia.local cert.rakulia.local aid.rakulia.local console.rakulia.local
+  networking.extraHosts = ''
+    192.168.88.186 phpmyadmin.local
   '';
 
   boot.kernelParams = [ "systemd.unified_cgroup_hierarchy=1" ];
@@ -274,3 +291,4 @@ fonts = {
 
 
 }
+

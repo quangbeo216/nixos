@@ -1,0 +1,209 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: backlog
+
+---
+# PVC cho MySQL data
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-data
+  namespace: backlog
+spec:
+  accessModes: [ReadWriteOnce]
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 5Gi
+
+---
+# Secret chứa credentials
+apiVersion: v1
+kind: Secret
+metadata:
+  name: backlog-secret
+  namespace: backlog
+type: Opaque
+stringData:
+  MYSQL_ROOT_PASSWORD: "mysql!@#123"
+  REDMINE_SECRET_KEY_BASE: "a3f1c9d8e7b64d2f1b9e4c8a6f0d2e7c3a9b8d7f6e5c4a3b2d1e0f9a8b7c6d5"
+
+---
+# MySQL Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+  namespace: backlog
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:8.0
+          args: ["--default-authentication-plugin=mysql_native_password"]
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: backlog-secret
+                  key: MYSQL_ROOT_PASSWORD
+            - name: MYSQL_DATABASE
+              value: backlog_redmine
+          ports:
+            - containerPort: 3306
+          volumeMounts:
+            - name: mysql-data
+              mountPath: /var/lib/mysql
+      volumes:
+        - name: mysql-data
+          persistentVolumeClaim:
+            claimName: mysql-data
+
+---
+# MySQL Service (internal)
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+  namespace: backlog
+spec:
+  selector:
+    app: mysql
+  ports:
+    - port: 3306
+      targetPort: 3306
+
+---
+# Redmine Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redmine
+  namespace: backlog
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redmine
+  template:
+    metadata:
+      labels:
+        app: redmine
+    spec:
+      containers:
+        - name: redmine
+          image: redmine:6.1.1
+          env:
+            - name: REDMINE_DB_MYSQL
+              value: mysql
+            - name: REDMINE_DB_PORT
+              value: "3306"
+            - name: REDMINE_DB_DATABASE
+              value: backlog_redmine
+            - name: REDMINE_DB_USERNAME
+              value: root
+            - name: REDMINE_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: backlog-secret
+                  key: MYSQL_ROOT_PASSWORD
+            - name: REDMINE_SECRET_KEY_BASE
+              valueFrom:
+                secretKeyRef:
+                  name: backlog-secret
+                  key: REDMINE_SECRET_KEY_BASE
+          ports:
+            - containerPort: 3000
+          volumeMounts:
+            - name: redmine-files
+              mountPath: /usr/src/redmine/files
+            - name: redmine-plugins
+              mountPath: /usr/src/redmine/plugins
+            - name: redmine-themes
+              mountPath: /usr/src/redmine/public/themes
+      volumes:
+        - name: redmine-files
+          hostPath:
+            path: /home/okmuc216/workspace/backlog.redmine/files
+        - name: redmine-plugins
+          hostPath:
+            path: /home/okmuc216/workspace/backlog.redmine/plugins
+        - name: redmine-themes
+          hostPath:
+            path: /home/okmuc216/workspace/backlog.redmine/themes
+
+---
+# Redmine Service — NodePort 3002 (nginx proxy không cần đổi)
+apiVersion: v1
+kind: Service
+metadata:
+  name: redmine
+  namespace: backlog
+spec:
+  type: NodePort
+  selector:
+    app: redmine
+  ports:
+    - port: 3000
+      targetPort: 3000
+      nodePort: 30002  # dùng port 30002, nginx sẽ trỏ vào đây
+
+---
+# PHPMyAdmin Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: phpmyadmin
+  namespace: backlog
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: phpmyadmin
+  template:
+    metadata:
+      labels:
+        app: phpmyadmin
+    spec:
+      containers:
+        - name: phpmyadmin
+          image: phpmyadmin:latest
+          env:
+            - name: PMA_HOST
+              value: mysql
+            - name: PMA_PORT
+              value: "3306"
+            - name: PMA_USER
+              value: root
+            - name: PMA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: backlog-secret
+                  key: MYSQL_ROOT_PASSWORD
+          ports:
+            - containerPort: 80
+
+---
+# PHPMyAdmin Service — NodePort 8083
+apiVersion: v1
+kind: Service
+metadata:
+  name: phpmyadmin
+  namespace: backlog
+spec:
+  type: NodePort
+  selector:
+    app: phpmyadmin
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30083

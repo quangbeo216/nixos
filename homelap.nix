@@ -7,13 +7,13 @@
   boot.loader.grub.enable = true;
   boot.loader.grub.device = "/dev/sda";
   boot.loader.grub.useOSProber = true;
- services.getty.autologinUser = "okmuc216";
+  services.getty.autologinUser = "okmuc216";
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
     vscode
     jdk17
-    neofetch
+    fastfetch
     zsh
     brave
     git
@@ -45,16 +45,17 @@
     flameshot
     cloudflared
     pm2
+    rustdesk
     #  wget
   ];
   services.tailscale.enable = true;
   services.openssh.enable = true;
   networking.firewall.allowedTCPPorts = [ 22 ];
   users.users.quangbeo216 = {
-  isNormalUser = true;
-  extraGroups = [ "wheel" ];
-};
-services.tailscale.extraUpFlags = [ "--ssh" ];
+    isNormalUser = true;
+    extraGroups = [ "wheel" ];
+  };
+  services.tailscale.extraUpFlags = [ "--ssh" ];
   systemd.services.cloudflared = {
     description = "Cloudflare Tunnel";
     after = [ "network.target" ];
@@ -69,29 +70,30 @@ services.tailscale.extraUpFlags = [ "--ssh" ];
     };
   };
 
+
   services.nginx = {
     enable = true;
 
     virtualHosts = {
-      "shopyensao.com" = {
-        locations."/" = {
-          proxyPass = "http://127.0.0.1:8050";  # port host map với Docker
-          proxyWebsockets = true;
-          extraConfig = ''
-            proxy_set_header Host              $host;
-            proxy_set_header X-Real-IP         $remote_addr;
-            proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto $scheme;
-            proxy_set_header X-Forwarded-Host  $host;
-            proxy_set_header X-Forwarded-Port  $server_port;
-
-            # Giúp tránh redirect sai port hoặc scheme
-            proxy_redirect off;
-            proxy_buffering off;  # tùy chọn, đôi khi giúp nhanh hơn
-          '';
-        };
-
-      };
+#      "shopyensao.com" = {
+#        locations."/" = {
+#          proxyPass = "http://127.0.0.1:8050";  # port host map với Docker
+#          proxyWebsockets = true;
+#          extraConfig = ''
+#            proxy_set_header Host              $host;
+#            proxy_set_header X-Real-IP         $remote_addr;
+#            proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+#            proxy_set_header X-Forwarded-Proto $scheme;
+#            proxy_set_header X-Forwarded-Host  $host;
+#            proxy_set_header X-Forwarded-Port  $server_port;
+#
+#            # Giúp tránh redirect sai port hoặc scheme
+#            proxy_redirect off;
+#            proxy_buffering off;  # tùy chọn, đôi khi giúp nhanh hơn
+#          '';
+#        };
+#
+#      };
       "ranking.shopyensao.com" = {
         locations."/" = {
           proxyPass = "http://127.0.0.1:3033";  # port host map với Docker
@@ -111,9 +113,30 @@ services.tailscale.extraUpFlags = [ "--ssh" ];
         };
 
       };
-      "backlog.shopyensao.com" = {
+ 
+
+      "crazyzo.com" = {
         locations."/" = {
-          proxyPass = "http://127.0.0.1:3002";  # port host map với Docker
+          proxyPass = "http://127.0.0.1:30004";  # k3s NodePort
+          proxyWebsockets = true;
+          extraConfig = ''
+            proxy_set_header Host              $host;
+            proxy_set_header X-Real-IP         $remote_addr;
+            proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Forwarded-Host  $host;
+            proxy_set_header X-Forwarded-Port  $server_port;
+
+            # Giúp tránh redirect sai port hoặc scheme
+            proxy_redirect off;
+            proxy_buffering off;  # tùy chọn, đôi khi giúp nhanh hơn
+          '';
+        };
+
+      };
+      "www.crazyzo.com" = {
+        locations."/" = {
+          proxyPass = "http://127.0.0.1:30004";  # k3s NodePort
           proxyWebsockets = true;
           extraConfig = ''
             proxy_set_header Host              $host;
@@ -131,9 +154,50 @@ services.tailscale.extraUpFlags = [ "--ssh" ];
 
       };
 
-      "crazyzo.com" = {
+      "admin.autocareflow.com" = {
         locations."/" = {
-          proxyPass = "http://127.0.0.1:3004";  # port host map với Docker
+          proxyPass = "http://127.0.0.1:30881";  # k3s NodePort - admin (Laravel)
+          proxyWebsockets = true;
+          extraConfig = ''
+            proxy_set_header Host              $host;
+            proxy_set_header X-Real-IP         $remote_addr;
+            proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Forwarded-Host  $host;
+            proxy_set_header X-Forwarded-Port  $server_port;
+
+            # Giúp tránh redirect sai port hoặc scheme
+            proxy_redirect off;
+            proxy_buffering off;  # tùy chọn, đôi khi giúp nhanh hơn
+          '';
+        };
+
+      };
+      "autocareflow.com" = {
+        globalRedirect = "www.autocareflow.com";
+      };
+      "www.autocareflow.com" = {
+        locations."/" = {
+          proxyPass = "http://127.0.0.1:30281";  # k3s NodePort - FE  (nodejs)
+          proxyWebsockets = true;
+          extraConfig = ''
+            proxy_set_header Host              $host;
+            proxy_set_header X-Real-IP         $remote_addr;
+            proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Forwarded-Host  $host;
+            proxy_set_header X-Forwarded-Port  $server_port;
+
+            # Giúp tránh redirect sai port hoặc scheme
+            proxy_redirect off;
+            proxy_buffering off;  # tùy chọn, đôi khi giúp nhanh hơn
+          '';
+        };
+
+      };
+      "backlog.crazyzo.com" = {
+        locations."/" = {
+          proxyPass = "http://127.0.0.1:3002";  
           proxyWebsockets = true;
           extraConfig = ''
             proxy_set_header Host              $host;
