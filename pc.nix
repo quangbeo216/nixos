@@ -6,7 +6,7 @@
   # Bootloader.
   boot.loader.grub.enable = true;
   #boot.loader.grub.device = "/dev/sda";
-  boot.loader.grub.device = "/dev/nvme0n1";
+    boot.loader.grub.device = "/dev/sda";
   boot.loader.grub.useOSProber = true;
 
   # List packages installed in system profile. To search, run:
@@ -14,14 +14,12 @@
   environment.systemPackages = with pkgs; [
     vscode
     jdk17
-    neofetch
+    fastfetch
     zsh
     dart
-    brave
     git
     flutter
     android-studio
-    google-chrome
     lm_sensors
     htop
     piper
@@ -45,7 +43,6 @@
     maven
     unzip
     mkcert
-    microsoft-edge
     protonvpn-gui
     flameshot
     gnome-extensions-cli
@@ -60,8 +57,10 @@
     pkg-config
     gtk3
     yarn
-    rustdesk
-    fcitx5
+    brave
+    google-chrome
+    cloudflared
+    cloudflare-warp
     #  wget
   ];
 

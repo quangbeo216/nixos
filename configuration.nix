@@ -36,8 +36,9 @@
 
   # Select internationalisation properties.
   i18n.defaultLocale = "en_US.UTF-8";
-
+services.dbus.enable = true;
   i18n.extraLocaleSettings = {
+    LC_ALL = "en_US.UTF-8";
     LC_ADDRESS = "vi_VN";
     LC_IDENTIFICATION = "vi_VN";
     LC_MEASUREMENT = "vi_VN";
@@ -48,26 +49,25 @@
     LC_TELEPHONE = "vi_VN";
     LC_TIME = "vi_VN";
   };
-  # Tắt IBus
 i18n.inputMethod = {
   enable = true;
   type = "fcitx5";
 
-  i18n.inputMethod = {
-    enable = true;
-    type = "fcitx5";
-    fcitx5.addons = with pkgs; [
-      qt6Packages.fcitx5-unikey  # Bộ gõ tiếng Việt
-      fcitx5-gtk           # Hỗ trợ cho ứng dụng GTK
-#      fcitx5-qt            # Hỗ trợ cho ứng dụng Qt
+  fcitx5 = {
+    waylandFrontend = true;
+    addons = with pkgs; [
+      fcitx5-gtk
+      qt6Packages.fcitx5-qt
+      qt6Packages.fcitx5-unikey
     ];
   };
-
+};
 
 environment.sessionVariables = {
-  XMODIFIERS = "@im=fcitx";   # cho XWayland app
-  QT_IM_MODULE = "fcitx";     # Qt < 6.8.2 và để tương thích GNOME Mutter
-  GTK_IM_MODULE = "fcitx";    # cho Chrome chạy XWayland
+  XMODIFIERS = "@im=fcitx";
+  GTK_IM_MODULE = "fcitx";
+  QT_IM_MODULE = "fcitx";
+  QT_IM_MODULES = "wayland;fcitx";
 };
   # Enable the GNOME Desktop Environment.
   # Configure keymap in X11
@@ -131,7 +131,7 @@ environment.sessionVariables = {
 
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
-  fonts = {
+fonts = {
     enableDefaultPackages = true;
     packages = with pkgs; [
       courier-prime    # chứa Nimbus Mono PS
@@ -210,8 +210,27 @@ environment.sessionVariables = {
     stdenv.cc.cc.lib
     gcc
     binutils
+      zsh-powerlevel10k
   ];
-  programs.zsh.enable = true;
+ programs.zsh = {
+    enable = true;
+
+    ohMyZsh = {
+      enable = true;
+      theme = "powerlevel10k/powerlevel10k";
+
+      plugins = [
+        "git"
+        "sudo"
+        "docker"
+        "kubectl"
+      ];
+    };
+  };
+
+  programs.zsh.promptInit = ''
+  source ${pkgs.zsh-powerlevel10k}/share/zsh-powerlevel10k/powerlevel10k.zsh-theme
+''; 
     # Gỡ GNOME Console
   environment.gnome.excludePackages = with pkgs; [
     gnome-console

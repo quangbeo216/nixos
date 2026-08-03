@@ -1,3 +1,10 @@
+# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+# Initialization code that may require console input (password prompts, [y/n]
+# confirmations, etc.) must go above this block; everything else may go below.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
 # Set PATH cho Nix profile (nếu dùng nix profile)
 if [ -d "$HOME/.nix-profile/bin" ]; then
   export PATH="$HOME/.nix-profile/bin:$PATH"
@@ -23,8 +30,8 @@ alias ...='cd ../..'
 autoload -U colors && colors
 
 # Nếu bạn dùng oh-my-zsh, uncomment dòng dưới
- source $HOME/.oh-my-zsh/oh-my-zsh.sh
- ZSH_THEME="agnoster"
+# source $HOME/.oh-my-zsh/oh-my-zsh.sh
+ # ZSH_THEME="agnoster"
  
  export DART_SDK_HOME=$(dirname $(dirname $(which dart)))/lib/dart
  export PATH=$DART_SDK_HOME/bin:$PATH
@@ -35,7 +42,7 @@ autoload -U colors && colors
 # Prompt config
 setopt prompt_subst
 
-PROMPT='%F{cyan}%n%f@%F{green}%m%f %F{yellow}%~%f $(git_prompt_info)%# '
+# PROMPT='%F{cyan}%n%f@%F{green}%m%f %F{yellow}%~%f $(git_prompt_info)%# '
 
 # Git branch hiển thị trong prompt
 autoload -Uz vcs_info
@@ -55,3 +62,6 @@ alias ...='cd ../..'
 HISTSIZE=5000
 SAVEHIST=5000
 HISTFILE=~/.zsh_history
+
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
