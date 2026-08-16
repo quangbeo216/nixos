@@ -4,9 +4,9 @@
 # To customize for PC, edit this file as needed.
 {
   # Bootloader.
+    # Bootloader.
   boot.loader.grub.enable = true;
-  #boot.loader.grub.device = "/dev/sda";
-    boot.loader.grub.device = "/dev/sda";
+  boot.loader.grub.device = "/dev/sda";
   boot.loader.grub.useOSProber = true;
 
   # List packages installed in system profile. To search, run:
@@ -17,9 +17,11 @@
     fastfetch
     zsh
     dart
+    brave
     git
     flutter
     android-studio
+    google-chrome
     lm_sensors
     htop
     piper
@@ -36,13 +38,14 @@
     termius
     filezilla
     postman
-    anydesk
+   #anydesk
     vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
     docker
     docker-compose
     maven
     unzip
     mkcert
+    microsoft-edge
     protonvpn-gui
     flameshot
     gnome-extensions-cli
@@ -57,10 +60,8 @@
     pkg-config
     gtk3
     yarn
-    brave
-    google-chrome
-    cloudflared
-    cloudflare-warp
+    rustdesk
+    fcitx5
     #  wget
   ];
 

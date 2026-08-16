@@ -7,12 +7,11 @@
 {
   imports =
     [ # Include the results of the hardware scan.
-      ./hardware-configuration.nix
-      ./homelap.nix
-      ./k3s.nix
+      ./laptop.nix
+      #./k3s.nix
     ];
-  boot.loader.systemd-boot.enable = false;
-  boot.loader.efi.canTouchEfiVariables = false;
+  #boot.loader.systemd-boot.enable = false;
+  #boot.loader.efi.canTouchEfiVariables = false;
 
   networking.hostName = "nixos"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
@@ -36,9 +35,8 @@
 
   # Select internationalisation properties.
   i18n.defaultLocale = "en_US.UTF-8";
-services.dbus.enable = true;
+
   i18n.extraLocaleSettings = {
-    LC_ALL = "en_US.UTF-8";
     LC_ADDRESS = "vi_VN";
     LC_IDENTIFICATION = "vi_VN";
     LC_MEASUREMENT = "vi_VN";
@@ -49,26 +47,21 @@ services.dbus.enable = true;
     LC_TELEPHONE = "vi_VN";
     LC_TIME = "vi_VN";
   };
-i18n.inputMethod = {
-  enable = true;
-  type = "fcitx5";
-
-  fcitx5 = {
-    waylandFrontend = true;
-    addons = with pkgs; [
-      fcitx5-gtk
-      qt6Packages.fcitx5-qt
+  i18n.inputMethod = {
+    enable = true;
+    type = "fcitx5";
+    fcitx5.addons = with pkgs; [
       qt6Packages.fcitx5-unikey
+      fcitx5-gtk
+      #fcitx5-qt
     ];
   };
-};
 
-environment.sessionVariables = {
-  XMODIFIERS = "@im=fcitx";
-  GTK_IM_MODULE = "fcitx";
-  QT_IM_MODULE = "fcitx";
-  QT_IM_MODULES = "wayland;fcitx";
-};
+  environment.sessionVariables = {
+    XMODIFIERS = "@im=fcitx";
+    QT_IM_MODULE = "fcitx";
+    GTK_IM_MODULE = "fcitx";
+  };
   # Enable the GNOME Desktop Environment.
   # Configure keymap in X11
   # Enable the X11 windowing system.
@@ -131,7 +124,7 @@ environment.sessionVariables = {
 
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
-fonts = {
+  fonts = {
     enableDefaultPackages = true;
     packages = with pkgs; [
       courier-prime    # chứa Nimbus Mono PS
@@ -210,27 +203,8 @@ fonts = {
     stdenv.cc.cc.lib
     gcc
     binutils
-      zsh-powerlevel10k
   ];
- programs.zsh = {
-    enable = true;
-
-    ohMyZsh = {
-      enable = true;
-      theme = "powerlevel10k/powerlevel10k";
-
-      plugins = [
-        "git"
-        "sudo"
-        "docker"
-        "kubectl"
-      ];
-    };
-  };
-
-  programs.zsh.promptInit = ''
-  source ${pkgs.zsh-powerlevel10k}/share/zsh-powerlevel10k/powerlevel10k.zsh-theme
-''; 
+  programs.zsh.enable = true;
     # Gỡ GNOME Console
   environment.gnome.excludePackages = with pkgs; [
     gnome-console
