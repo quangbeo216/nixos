@@ -1,16 +1,18 @@
-# Laptop-specific configuration
+# Laptop-specific configuration.
 { config, pkgs, ... }:
 
 {
-  imports = [ ./hardware-configuration.nix ];
-  # ...existing code from configuration.nix...
-# Bootloader.
+  imports = [
+    ./common.nix
+    ./hardware-configuration.nix
+  ];
+
+  networking.hostName = "laptop";
+
   boot.loader.grub.enable = true;
   boot.loader.grub.device = "/dev/sda";
   boot.loader.grub.useOSProber = true;
 
-  # List packages installed in system profile. To search, run:
-  # $ nix search wget
   environment.systemPackages = with pkgs; [
     vscode
     jdk17
@@ -26,9 +28,12 @@
     python3Packages.pip  # cài luôn pip
     nodejs_22
     kitty
-    fira-code  
+    fira-code
+    nerd-fonts.fira-code
+    zsh-powerlevel10k
+    zsh-autosuggestions
+    zsh-syntax-highlighting
     nautilus
-    fira-code  
     gnome-tweaks
     tmux
     jetbrains-toolbox
@@ -58,7 +63,10 @@
     gtk3
     yarn
     rustdesk
-    fcitx5
+    telegram-desktop
+    navicat-premium
     #  wget
   ];
+
+  services.tailscale.enable = true;
 }

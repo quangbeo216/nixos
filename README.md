@@ -1,9 +1,37 @@
 # nixos
-cp /etc/nixos/configuration.nix ~/nixos-config/
+
+## Multi-machine layout
+Shared settings live in `common.nix`. Each machine only keeps what's
+different (hostname, bootloader, packages, services) in its own file:
+`laptop.nix`, `pc.nix`, `homelap.nix`. All three import `common.nix` +
+`hardware-configuration.nix`.
+
+`configuration.nix` and `hardware-configuration.nix` are gitignored — they're
+per-machine and set up once, not shared through git.
+
+## First-time setup on a new/existing machine
 cp /etc/nixos/hardware-configuration.nix ~/nixos-config/
 
 sudo mv /etc/nixos /etc/nixos.backup
 sudo ln -s ~/nixos-config /etc/nixos
+
+# Create configuration.nix for THIS machine — it just imports the right
+# host file. Pick exactly one:
+
+cat > ~/nixos-config/configuration.nix <<'EOF'   # laptop
+{ config, pkgs, ... }:
+{ imports = [ ./laptop.nix ]; }
+EOF
+
+cat > ~/nixos-config/configuration.nix <<'EOF'   # desktop PC
+{ config, pkgs, ... }:
+{ imports = [ ./pc.nix ]; }
+EOF
+
+cat > ~/nixos-config/configuration.nix <<'EOF'   # homelab server
+{ config, pkgs, ... }:
+{ imports = [ ./homelap.nix ]; }
+EOF
 
 # jet
 jetbrains-toolbox &

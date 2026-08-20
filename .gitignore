@@ -1,3 +1,6 @@
 hardware-configuration.nix
+# configuration.nix is now a per-machine symlink to laptop.nix / pc.nix / homelap.nix,
+# see README.md — never commit a specific machine's choice here.
+configuration.nix
 .idea
 .idea/

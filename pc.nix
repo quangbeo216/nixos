@@ -1,16 +1,18 @@
-# PC-specific configuration
+# Desktop PC-specific configuration.
 { config, pkgs, ... }:
 
-# To customize for PC, edit this file as needed.
 {
-  # Bootloader.
-    # Bootloader.
+  imports = [
+    ./common.nix
+    ./hardware-configuration.nix
+  ];
+
+  networking.hostName = "pc";
+
   boot.loader.grub.enable = true;
   boot.loader.grub.device = "/dev/sda";
   boot.loader.grub.useOSProber = true;
 
-  # List packages installed in system profile. To search, run:
-  # $ nix search wget
   environment.systemPackages = with pkgs; [
     vscode
     jdk17
@@ -29,9 +31,8 @@
     python3Packages.pip  # cài luôn pip
     nodejs_22
     kitty
-    fira-code  
+    fira-code
     nautilus
-    fira-code  
     gnome-tweaks
     tmux
     jetbrains-toolbox
@@ -64,6 +65,4 @@
     fcitx5
     #  wget
   ];
-
-  
 }

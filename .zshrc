@@ -5,6 +5,11 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
+# Powerlevel10k theme (từ nixos-config: environment.systemPackages -> zsh-powerlevel10k)
+# Guard bằng -r phòng khi chưa `nixos-rebuild switch` sau khi thêm package
+[[ -r /run/current-system/sw/share/zsh-powerlevel10k/powerlevel10k.zsh-theme ]] &&
+  source /run/current-system/sw/share/zsh-powerlevel10k/powerlevel10k.zsh-theme
+
 # Set PATH cho Nix profile (nếu dùng nix profile)
 if [ -d "$HOME/.nix-profile/bin" ]; then
   export PATH="$HOME/.nix-profile/bin:$PATH"
@@ -19,37 +24,15 @@ export ANDROID_HOME="$HOME/Android/Sdk"
 export PATH="$ANDROID_HOME/emulator:$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools:$PATH"
 
 # Flutter SDK (nếu cài bằng Nix)
-export PATH="$HOME/.nix-profile/bin:$PATH"
-
-# Alias tiện dụng
-alias ll='ls -alF'
-alias ..='cd ..'
-alias ...='cd ../..'
+if command -v dart >/dev/null 2>&1; then
+  export DART_SDK_HOME=$(dirname $(dirname $(which dart)))/lib/dart
+  export PATH=$DART_SDK_HOME/bin:$PATH
+fi
+export PATH="$HOME/.local/bin:$PATH"
 
 # Enable colored output
 autoload -U colors && colors
-
-# Nếu bạn dùng oh-my-zsh, uncomment dòng dưới
-# source $HOME/.oh-my-zsh/oh-my-zsh.sh
- # ZSH_THEME="agnoster"
- 
- export DART_SDK_HOME=$(dirname $(dirname $(which dart)))/lib/dart
- export PATH=$DART_SDK_HOME/bin:$PATH
-
-# Enable colors
-autoload -U colors && colors
-
-# Prompt config
 setopt prompt_subst
-
-# PROMPT='%F{cyan}%n%f@%F{green}%m%f %F{yellow}%~%f $(git_prompt_info)%# '
-
-# Git branch hiển thị trong prompt
-autoload -Uz vcs_info
-precmd() { vcs_info }
-zstyle ':vcs_info:git:*' formats '(%b)'
-zstyle ':vcs_info:*' enable git
-RPROMPT='%F{magenta}${vcs_info_msg_0_}%f'
 
 # Aliases hay dùng
 alias ll='ls -lah --color=auto'
@@ -62,6 +45,14 @@ alias ...='cd ../..'
 HISTSIZE=5000
 SAVEHIST=5000
 HISTFILE=~/.zsh_history
+
+# zsh-autosuggestions (gợi ý lệnh từ history khi gõ)
+[[ -r /run/current-system/sw/share/zsh-autosuggestions/zsh-autosuggestions.zsh ]] &&
+  source /run/current-system/sw/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+
+# zsh-syntax-highlighting (phải source SAU CÙNG, sau mọi plugin/widget khác)
+[[ -r /run/current-system/sw/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]] &&
+  source /run/current-system/sw/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh

@@ -1,15 +1,21 @@
-# PC-specific configuration
+# Homelab server-specific configuration (nginx reverse proxy, cloudflared,
+# k3s, remote access). Not used on laptop/pc.
 { config, pkgs, ... }:
 
-# To customize for PC, edit this file as needed.
 {
-  # Bootloader.
+  imports = [
+    ./common.nix
+    ./hardware-configuration.nix
+    ./k3s.nix
+  ];
+
+  networking.hostName = "homelap";
+
   boot.loader.grub.enable = true;
   boot.loader.grub.device = "/dev/sda";
   boot.loader.grub.useOSProber = true;
   services.getty.autologinUser = "okmuc216";
-  # List packages installed in system profile. To search, run:
-  # $ nix search wget
+
   environment.systemPackages = with pkgs; [
     vscode
     jdk17
@@ -25,9 +31,8 @@
     python3Packages.pip  # cài luôn pip
     nodejs_22
     kitty
-    fira-code  
+    fira-code
     nautilus
-    fira-code  
     gnome-tweaks
     tmux
     jetbrains-toolbox
@@ -48,52 +53,40 @@
     rustdesk
     #  wget
   ];
+
   services.tailscale.enable = true;
+  services.tailscale.extraUpFlags = [ "--ssh" ];
   services.openssh.enable = true;
-  networking.firewall.allowedTCPPorts = [ 22 ];
+
   users.users.quangbeo216 = {
     isNormalUser = true;
     extraGroups = [ "wheel" ];
   };
-  services.tailscale.extraUpFlags = [ "--ssh" ];
-  systemd.services.cloudflared = {
-    description = "Cloudflare Tunnel";
-    after = [ "network.target" ];
-    wantedBy = [ "multi-user.target" ];
 
-    serviceConfig = {
-      ExecStart = ''
-        ${pkgs.cloudflared}/bin/cloudflared tunnel run --token eyJhIjoiNzJiNTQ2MmU4ZGRmYjE3OTM0ZTU2ZGFjMTc2YTA2MjYiLCJ0IjoiYTdjY2Q5NDktZWY4MC00YWRmLWFlMjAtYjQxMDg1MWI3OWFmIiwicyI6Ik1qVTRZV1V4Wm1JdFpqWXpaaTAwWVdWaExXRmhZemd0WXpBMU56ZzVPR1k1TWpFeCJ9
-      '';
-      Restart = "always";
-      RestartSec = 5;
-    };
+  # k3s needs the legacy cgroup hierarchy + iptables-based cgroup driver.
+  boot.kernelParams = [ "systemd.unified_cgroup_hierarchy=1" ];
+  virtualisation.docker.extraOptions = "--experimental --exec-opt native.cgroupdriver=systemd";
+  systemd.services.docker.serviceConfig = {
+    PrivateTmp = false;
+    ProtectHome = false;
+    MountFlags = "shared";
   };
 
+  networking.extraHosts = ''
+    192.168.88.186 phpmyadmin.local
+  '';
+
+  networking.firewall.allowedTCPPorts = [
+    22   # SSH
+    443  # Nginx HTTPS
+    3306 # MySQL
+    5432 # Postgres
+  ];
 
   services.nginx = {
     enable = true;
 
     virtualHosts = {
-#      "shopyensao.com" = {
-#        locations."/" = {
-#          proxyPass = "http://127.0.0.1:8050";  # port host map với Docker
-#          proxyWebsockets = true;
-#          extraConfig = ''
-#            proxy_set_header Host              $host;
-#            proxy_set_header X-Real-IP         $remote_addr;
-#            proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
-#            proxy_set_header X-Forwarded-Proto $scheme;
-#            proxy_set_header X-Forwarded-Host  $host;
-#            proxy_set_header X-Forwarded-Port  $server_port;
-#
-#            # Giúp tránh redirect sai port hoặc scheme
-#            proxy_redirect off;
-#            proxy_buffering off;  # tùy chọn, đôi khi giúp nhanh hơn
-#          '';
-#        };
-#
-#      };
       "ranking.shopyensao.com" = {
         locations."/" = {
           proxyPass = "http://127.0.0.1:3033";  # port host map với Docker
@@ -113,7 +106,6 @@
         };
 
       };
- 
 
       "crazyzo.com" = {
         locations."/" = {
@@ -197,7 +189,7 @@
       };
       "backlog.crazyzo.com" = {
         locations."/" = {
-          proxyPass = "http://127.0.0.1:3002";  
+          proxyPass = "http://127.0.0.1:3002";
           proxyWebsockets = true;
           extraConfig = ''
             proxy_set_header Host              $host;
@@ -217,6 +209,20 @@
     };
   };
 
+  systemd.services.cloudflared = {
+    description = "Cloudflare Tunnel";
+    after = [ "network.target" ];
+    wantedBy = [ "multi-user.target" ];
+
+    serviceConfig = {
+      ExecStart = ''
+        ${pkgs.cloudflared}/bin/cloudflared tunnel run --token eyJhIjoiNzJiNTQ2MmU4ZGRmYjE3OTM0ZTU2ZGFjMTc2YTA2MjYiLCJ0IjoiYTdjY2Q5NDktZWY4MC00YWRmLWFlMjAtYjQxMDg1MWI3OWFmIiwicyI6Ik1qVTRZV1V4Wm1JdFpqWXpaaTAwWVdWaExXRmhZemd0WXpBMU56ZzVPR1k1TWpFeCJ9
+      '';
+      Restart = "always";
+      RestartSec = 5;
+    };
+  };
+
   systemd.services.homelan-autostart = {
     description = "Homelab Auto Start Script";
     after = [ "docker.service" "network.target" ];
@@ -233,4 +239,21 @@
     };
   };
 
+  # Kept for reference, currently unused (postgres runs in a container instead):
+  # services.postgresql = {
+  #   enable = true;
+  #   package = pkgs.postgresql_15;
+  #   dataDir = "/var/lib/postgresql/data";
+  #   initialScript = null;
+  #   settings = {
+  #     listen_addresses = pkgs.lib.mkForce "*";
+  #     port = 5432;
+  #     max_connections = 100;
+  #     shared_buffers = "128MB";
+  #   };
+  #   authentication = ''
+  #     local   all             postgres                                peer
+  #     host    all             all             172.21.0.0/16         md5
+  #   '';
+  # };
 }
